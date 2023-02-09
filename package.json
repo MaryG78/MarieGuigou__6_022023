@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/MaryG78/MarieGuigou__6_022023#readme",
   "dependencies": {
-    "dotenv": "^16.0.3"
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2"
   }
 }
