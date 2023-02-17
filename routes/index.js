@@ -1,10 +1,14 @@
 const express = require('express')
 const router = express.Router();
 const userRoute = require('./user')
+const sauceRoute = require('./Sauce')
+
 // const auth = require('auth') 
-// const routerCtrl = require('../controllers/router')
+
 
 router.use("/auth", userRoute)
+router.use("/auth", sauceRoute);
+
 
 module.exports = router
 
