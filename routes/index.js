@@ -2,12 +2,13 @@ const express = require('express')
 const router = express.Router();
 const userRoute = require('./user')
 const sauceRoute = require('./Sauce')
+const multer = require('../middleware/multer')
 
 // const auth = require('auth') 
 
 
 router.use("/auth", userRoute)
-router.use("/auth", sauceRoute);
+router.use(sauceRoute);
 
 
 module.exports = router
