@@ -8,9 +8,8 @@ const fs = require("fs");
 
 app.use(express.json());
 
-exports.createSauce = (req, res) => {
-  const sauceObject = JSON.parse(req.body.sauce);
-  delete sauceObject._id;
+exports.createSauce = (req, res, next) => {
+  const sauceObject = JSON.parse(req.body.Sauce);
   delete sauceObject._userId;
   const sauce = new Sauce({
     ...sauceObject,
@@ -19,7 +18,6 @@ exports.createSauce = (req, res) => {
       req.file.filename
     }`,
   });
-
   sauce
     .save()
     .then(() => {

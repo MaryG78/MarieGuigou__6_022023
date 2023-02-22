@@ -13,5 +13,5 @@ const sauceSchema = mongoose.Schema({
   usersDisliked: { type: [String], required: true },
 });
 
-module.exports = mongoose.model("sauce", sauceSchema);
+module.exports = mongoose.model("Sauce", sauceSchema);
 
