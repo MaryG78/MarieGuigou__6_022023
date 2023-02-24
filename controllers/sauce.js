@@ -39,3 +39,32 @@ exports.getOneSauce = (req, res, next) => {
     .then((sauce) => res.status(200).json(sauce))
     .catch((error) => res.status(404).json({ error }));
 };
+
+exports.modifySauce = (req, res, next) => {
+  const sauceObject = req.file
+    ? {
+        ...JSON.parse(req.body.sauce),
+        imageUrl: `${req.protocol}://${req.get("host")}/images/${
+          req.file.filename
+        }`,
+      }
+    : { ...req.body };
+
+  delete sauceObject._userId;
+  Sauce.findOne({ _id: req.params.id }) // on récupère la sauce ds la base de données
+    .then((sauce) => {
+      // on verifier que la sauce appartient bien au user qui nous envoie la requête put
+      if (sauce.userId != req.auth.userId) {
+        res.status(401).json({ message: "Non-autorisé" });
+      } else {
+        Sauce.updateOne(
+          { _id: req.params.id }, // la sauce à mettre à jour
+          { ...sauceObject, _id: req.params.id }) // avec quel objet : avec ce qu'on a récupéré ds le corps de la fonction
+              .then(() => res.status(200).json({ message: "La sauce a été modifiée" }))
+              .catch((error) => res.status(401).json({ error }));
+      }
+    })
+    .catch((error) => res.status(400).json({ error }));
+};
+
+
