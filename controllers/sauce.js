@@ -9,7 +9,7 @@ const fs = require("fs");
 app.use(express.json());
 
 exports.createSauce = (req, res, next) => {
-  const sauceObject = JSON.parse(req.body.Sauce);
+  const sauceObject = JSON.parse(req.body.sauce);
   delete sauceObject._userId;
   const sauce = new Sauce({
     ...sauceObject,
