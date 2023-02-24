@@ -5,14 +5,8 @@ const app = express();
 app.use(express.json());
 
 exports.likeSauce = (req, res, next) => {
-  console.log("je suis dans le controller like ");
-
-  console.log(req.body);
-  console.log({ _id: req.params.id });
-
   Sauce.findOne({ _id: req.params.id })
     .then((sauce) => {
-      console.log(sauce);
       const isUserLiked = sauce.usersLiked.includes(req.body.userId);
       const isUsersDisliked = sauce.usersDisliked.includes(req.body.userId);
 
