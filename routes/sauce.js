@@ -10,9 +10,7 @@ const like = require("../controllers/like")
 
 router.post("/", auth, multer, sauceCtrl.createSauce);
 router.post("/:id/like", auth, like.likeSauce);
-
-
-
-// router.get("/sauce", auth, sauceCtrl.getSauce)
+router.get("/", auth, sauceCtrl.getAllSauce);
+router.get("/:id", auth, sauceCtrl.getOneSauce);
 
 module.exports = router;
