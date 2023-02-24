@@ -13,7 +13,7 @@ const MIME_TYPES = {
 // diskStorage => destination du fichier / générer un nom de fichier unique
 const storage = multer.diskStorage({
   destination: (req, file, callback) => {
-    callback(null, "../images");
+    callback(null, "images");
   },
   filename: (req, file, callback) => {
     const name = file.originalname.split(" ").join("_")

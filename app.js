@@ -3,6 +3,7 @@ const app = express();
 app.use(express.json());
 const routes = require("./routes/index");
 require("./config/db.config")
+const path = require("path");
 
 
 
@@ -29,7 +30,9 @@ app.use((req, res, next) => {
 //   res.status(201);
 // });
 
+app.use("./images", express.static(path.join(__dirname, "images")));
 app.use("/api", routes);
+
 
 
 module.exports = app;
