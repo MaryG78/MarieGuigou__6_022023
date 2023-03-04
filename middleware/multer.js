@@ -8,6 +8,7 @@ const MIME_TYPES = {
     "image/jpeg" : "jpg",
     "image/gif" : "gif",
     "image/png" : "png",
+    "image/webp" : "webp",
 };
 
 // diskStorage => destination du fichier / générer un nom de fichier unique

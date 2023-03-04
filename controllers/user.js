@@ -1,5 +1,5 @@
 const bcrypt = require("bcrypt");
-const cryptojs = require("crypto-js");
+const cryptoJs = require("crypto-js");
 const jwt = require("jsonwebtoken");
 const User = require("../models/user");
 const express = require("express");
@@ -9,10 +9,10 @@ app.use(express.json());
 
 exports.signup = (req, res, next) => {
   // chiffrage de l'email avant envoie
-  const emailCryptoJs = cryptojs.HmacSHA256(
-    req.body.email,
-    "CLE_SECRETE".toString()
-  );
+  const emailCryptoJs = cryptoJs
+    .HmacSHA256(req.body.email, `process.env.{$CRYPTOJS_EMAIL}`)
+    .toString();
+  ;
   console.log(emailCryptoJs);
   bcrypt
     .hash(req.body.password, 10)
@@ -30,7 +30,12 @@ exports.signup = (req, res, next) => {
 };
 
 exports.login = (req, res, next) => {
-  User.findOne({ email: req.body.email })
+    const emailCryptoJs = cryptoJs
+      .HmacSHA256(req.body.email, `process.env.{$CRYPTOJS_EMAIL}`)
+      .toString();
+    ;
+
+  User.findOne({ email: emailCryptoJs })
     .then((user) => {
       if (user === null) {
         res
@@ -58,3 +63,5 @@ exports.login = (req, res, next) => {
     })
     .catch((error) => res.status(500).json({ error }));
 };
+
+
