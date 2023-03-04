@@ -5,8 +5,12 @@ const routes = require("./routes/index");
 require("./config/db.config");
 const path = require("path");
 const logger = require("./config/logger");
+const cors = require("cors");
+const mongoSanitize = require("express-mongo-sanitize");
+const mongoose = require("mongoose");
 
 // CORS management
+app.use(cors());
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader(
@@ -26,5 +30,11 @@ app.use(function (req, res, next) {
   req.logger = logger;
   next();
 });
+app.use(mongoSanitize());
+mongoose.connect(process.env.MONGO_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
+
 
 module.exports = app;
