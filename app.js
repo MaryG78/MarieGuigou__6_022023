@@ -30,7 +30,12 @@ app.use(function (req, res, next) {
   req.logger = logger;
   next();
 });
-app.use(mongoSanitize());
+app.use(
+  mongoSanitize({
+    replaceWith: "_",
+  })
+);
+
 mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
