@@ -13,7 +13,7 @@ exports.signup = (req, res, next) => {
     .HmacSHA256(req.body.email, `process.env.{$CRYPTOJS_EMAIL}`)
     .toString();
   ;
-  console.log(emailCryptoJs);
+
   bcrypt
     .hash(req.body.password, 10)
     .then((hash) => {

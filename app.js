@@ -4,6 +4,7 @@ app.use(express.json());
 const routes = require("./routes/index");
 require("./config/db.config");
 const path = require("path");
+const logger = require("./config/logger");
 
 // CORS management
 app.use((req, res, next) => {
@@ -21,5 +22,9 @@ app.use((req, res, next) => {
 
 app.use("./images", express.static(path.join(__dirname, "images")));
 app.use("/api", routes);
+app.use(function (req, res, next) {
+  req.logger = logger;
+  next();
+});
 
 module.exports = app;
