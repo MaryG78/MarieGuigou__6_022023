@@ -9,6 +9,7 @@ const cors = require("cors");
 const mongoSanitize = require("express-mongo-sanitize");
 const mongoose = require("mongoose");
 const limiter = require("./middleware/limiter");
+const speedLimiter = require("./middleware/limiter");
 
 // CORS management
 app.use(cors());
@@ -25,18 +26,15 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use("/api", limiter, routes);
+app.use("/api", limiter, speedLimiter, routes);
 
 app.use("/images", express.static(path.join(__dirname, "images")));
 app.use(function (req, res, next) {
   req.logger = logger;
   next();
 });
-app.use(
-  mongoSanitize({
-    replaceWith: "_",
-  })
-);
+
+app.use(mongoSanitize());
 
 mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
