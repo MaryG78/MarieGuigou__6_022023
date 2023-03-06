@@ -10,9 +10,22 @@ const mongoSanitize = require("express-mongo-sanitize");
 const mongoose = require("mongoose");
 const limiter = require("./middleware/limiter");
 const speedLimiter = require("./middleware/limiter");
+const helmet = require("helmet")
+
+app.use(
+  helmet({
+    crossOriginResourcePolicy: false,
+  })
+);
+app.use(helmet())
 
 // CORS management
-app.use(cors());
+app.use(
+  cors({
+    credentials: true,
+    origin: true,
+  })
+);
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader(
