@@ -8,6 +8,7 @@ const logger = require("./config/logger");
 const cors = require("cors");
 const mongoSanitize = require("express-mongo-sanitize");
 const mongoose = require("mongoose");
+const limiter = require("./middleware/limiter");
 
 // CORS management
 app.use(cors());
@@ -24,8 +25,9 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use("./images", express.static(path.join(__dirname, "images")));
-app.use("/api", routes);
+app.use("/api", limiter, routes);
+
+app.use("/images", express.static(path.join(__dirname, "images")));
 app.use(function (req, res, next) {
   req.logger = logger;
   next();
@@ -40,6 +42,5 @@ mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
-
 
 module.exports = app;
