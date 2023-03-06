@@ -1,5 +1,6 @@
 const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken")
+const cryptoJs = require("crypto-js");
+const jwt = require("jsonwebtoken");
 const User = require("../models/user");
 const express = require("express");
 const app = express();
@@ -7,11 +8,17 @@ const app = express();
 app.use(express.json());
 
 exports.signup = (req, res, next) => {
+  // chiffrage de l'email avant envoie
+  const emailCryptoJs = cryptoJs
+    .HmacSHA256(req.body.email, `process.env.{$CRYPTOJS_EMAIL}`)
+    .toString();
+  ;
+
   bcrypt
     .hash(req.body.password, 10)
     .then((hash) => {
       const user = new User({
-        email: req.body.email,
+        email: emailCryptoJs,
         password: hash,
       });
       user
@@ -23,8 +30,12 @@ exports.signup = (req, res, next) => {
 };
 
 exports.login = (req, res, next) => {
-  User
-    .findOne({ email: req.body.email })
+    const emailCryptoJs = cryptoJs
+      .HmacSHA256(req.body.email, `process.env.{$CRYPTOJS_EMAIL}`)
+      .toString();
+    ;
+
+  User.findOne({ email: emailCryptoJs })
     .then((user) => {
       if (user === null) {
         res
@@ -41,11 +52,9 @@ exports.login = (req, res, next) => {
             } else {
               res.status(200).json({
                 userId: user._id,
-                token: jwt.sign(
-                    {userId: user._id},
-                    'RANDOM_TOKEN_SECRET',
-                    {expiresIn: '24h'}
-                ),
+                token: jwt.sign({ userId: user._id }, "RANDOM_TOKEN_SECRET", {
+                  expiresIn: "24h",
+                }),
               });
             }
           })

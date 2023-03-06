@@ -4,10 +4,11 @@ const multer = require("multer");
 
 //MIME TYPES
 const MIME_TYPES = {
-    "image.jpg" : "jpg",
+    "image/jpg" : "jpg",
     "image/jpeg" : "jpg",
     "image/gif" : "gif",
     "image/png" : "png",
+    "image/webp" : "webp",
 };
 
 // diskStorage => destination du fichier / générer un nom de fichier unique
@@ -16,12 +17,12 @@ const storage = multer.diskStorage({
     callback(null, "images");
   },
   filename: (req, file, callback) => {
-    const name = file.originalname.split(" ").join("_")
+    const name = file.originalname.split(" ").join("_").split(".")[0]
     const extension = MIME_TYPES[file.mimetype]
-    callback(null, name + Date.now + "." + extension);
+    callback(null, name +  "_" + Date.now() + "." + extension);
   },
 });
 
 
 
-module.exports = multer({storage}).single("image");
+module.exports = multer({storage: storage}).single("image");
