@@ -9,6 +9,13 @@ const fs = require("fs");
 app.use(express.json());
 
 exports.createSauce = (req, res, next) => {
+  if (!req.file) {
+    return res.status(420).json({message: "Image manquante"});
+  }
+  if(!req.body) {
+    return res.status(420).json({ message: "Texte manquant" });
+  }
+  
   const sauceObject = JSON.parse(req.body.sauce);
   delete sauceObject._userId;
   const sauce = new Sauce({

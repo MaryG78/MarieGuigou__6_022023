@@ -15,6 +15,7 @@ exports.likeSauce = (req, res, next) => {
           if (!isUserLiked && !isUsersDisliked) {
             Sauce.updateOne(
               { _id: req.params.id },
+
               {
                 $inc: { likes: 1 },
                 $push: { usersLiked: req.body.userId },
@@ -23,6 +24,20 @@ exports.likeSauce = (req, res, next) => {
               .then(() => res.status(201).json({ message: "Sauce like +1" }))
               .catch((error) => res.status(400).json({ error }));
           }
+
+          if (!isUserLiked && isUsersDisliked) {
+            Sauce.updateOne(
+              { _id: req.params.id },
+              {
+                $inc: { likes: 1, dislikes: -1 },
+                $push: { usersLiked: req.body.userId },
+                $pull: { usersDisliked: req.body.userId },
+              }
+            )
+              .then(() => res.status(201).json({ message: "Sauce like +1" }))
+              .catch((error) => res.status(400).json({ error }));
+          }
+
           break;
 
         case -1:
@@ -37,6 +52,20 @@ exports.likeSauce = (req, res, next) => {
               .then(() => res.status(201).json({ message: "Sauce dislike 1" }))
               .catch((error) => res.status(400).json({ error }));
           }
+
+          if (!isUsersDisliked && isUserLiked) {
+            Sauce.updateOne(
+              { _id: req.params.id },
+              {
+                $inc: { dislikes: 1, likes: -1 },
+                $push: { usersDisliked: req.body.userId },
+                $pull: { usersLiked: req.body.userId },
+              }
+            )
+              .then(() => res.status(201).json({ message: "Sauce dislike 1" }))
+              .catch((error) => res.status(400).json({ error }));
+          }
+
           break;
 
         case 0:
@@ -62,6 +91,13 @@ exports.likeSauce = (req, res, next) => {
             )
               .then(() => res.status(201).json({ message: "Sauce dislike -1" }))
               .catch((error) => res.status(400).json({ error }));
+          }
+
+          if (!isUserLiked && !isUsersDisliked) {
+            res.status(200).json({
+              message:
+                "Vous n'avez pas encore donné votre avis sur cette sauce.",
+            });
           }
           break;
       }
