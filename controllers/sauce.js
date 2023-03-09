@@ -43,7 +43,15 @@ exports.getAllSauce = (req, res, next) => {
 
 exports.getOneSauce = (req, res, next) => {
   Sauce.findOne({ _id: req.params.id })
-    .then((sauce) => res.status(200).json(sauce))
+    .then((sauce) =>
+      res.status(200).json(sauce, [
+        {
+          rel: "self",
+          method: "GET",
+          href: `${req.protocol}://${req.get("host")}/api/sauces/${sauce._id}`,
+        },
+      ])
+    )
     .catch((error) => res.status(404).json({ error }));
 };
 
@@ -62,7 +70,7 @@ exports.modifySauce = (req, res, next) => {
     .then((sauce) => {
       // on verifier que la sauce appartient bien au user qui nous envoie la requête put
       if (sauce.userId != req.auth.userId) {
-        res.status(401).json({ message: "Non-autorisé" });
+        res.status(403).json({ message: "Non-autorisé" });
       } else {
         Sauce.updateOne(
           { _id: req.params.id }, // la sauce à mettre à jour
