@@ -10,9 +10,9 @@ app.use(express.json());
 
 exports.createSauce = (req, res, next) => {
   if (!req.file) {
-    return res.status(420).json({message: "Image manquante"});
+    return res.status(420).json({ message: "Image manquante" });
   }
-  if (!(req.body.sauce)) {
+  if (!req.body.sauce) {
     return res.status(420).json({ message: "Texte manquant" });
   }
 
@@ -29,8 +29,13 @@ exports.createSauce = (req, res, next) => {
   sauce
     .save()
     .then(() => {
-      res.status(201).json({ message: "Sauce enregistrée !" });
-
+      res.status(200).json(sauce, [
+        {
+          rel: "self",
+          method: "POST",
+          href: `${req.protocol}://${req.get("host")}/api/sauces`,
+        },
+      ]);
     })
     .catch((error) => {
       res.status(400).json({ error });
@@ -39,7 +44,27 @@ exports.createSauce = (req, res, next) => {
 
 exports.getAllSauce = (req, res, next) => {
   Sauce.find()
-    .then((sauces) => res.status(200).json(sauces))
+    .then((sauces) => {
+      if (sauces.length <= 0) {
+        return res.status(404).json({ error: "Aucune sauce n'a été crée" });
+      } else {
+        const saucesHateoas = sauces.map((sauce) => {
+          return {
+            ...sauce._doc,
+            links: [
+              {
+                rel: "self",
+                method: "GET",
+                href: `${req.protocol}://${req.get("host")}/api/sauces/${
+                  sauce._id
+                }`,
+              },
+            ],
+          };
+        });
+        res.status(200).json(saucesHateoas);
+      }
+    })
     .catch((error) => res.status(400).json({ error }));
 };
 
@@ -76,9 +101,20 @@ exports.modifySauce = (req, res, next) => {
       } else {
         Sauce.updateOne(
           { _id: req.params.id }, // la sauce à mettre à jour
-          { ...sauceObject, _id: req.params.id }) // avec quel objet : avec ce qu'on a récupéré ds le corps de la fonction
-              .then(() => res.status(200).json({ message: "La sauce a été modifiée" }))
-              .catch((error) => res.status(401).json({ error }));
+          { ...sauceObject, _id: req.params.id }
+        ) // avec quel objet : avec ce qu'on a récupéré ds le corps de la fonction
+          .then(() =>
+            res.status(200).json(sauce, [
+              {
+                rel: "self",
+                method: "PUT",
+                href: `${req.protocol}://${req.get("host")}/api/sauces/${
+                  sauce._id
+                }`,
+              },
+            ])
+          )
+          .catch((error) => res.status(401).json({ error }));
       }
     })
     .catch((error) => res.status(400).json({ error }));
@@ -91,10 +127,18 @@ exports.deleteSauce = (req, res, next) => {
         res.status(401).json({ message: "Not authorized" });
       } else {
         const filename = sauce.imageUrl.split("/images/")[1]; // récupère le nom du fichier à supp
-        fs.unlink(`images/${filename}`, () => { 
+        fs.unlink(`images/${filename}`, () => {
           Sauce.deleteOne({ _id: req.params.id })
             .then(() => {
-              res.status(200).json({ message: "Sauce supprimée !" });
+              res.status(200).json(sauce, [
+                {
+                  rel: "self",
+                  method: "DELETE",
+                  href: `${req.protocol}://${req.get("host")}/api/sauces/${
+                    sauce._id
+                  }`,
+                },
+              ]);
             })
             .catch((error) => res.status(401).json({ error }));
         });
@@ -104,7 +148,3 @@ exports.deleteSauce = (req, res, next) => {
       res.status(500).json({ error });
     });
 };
-
-
-
-
