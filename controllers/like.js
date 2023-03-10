@@ -1,8 +1,4 @@
 const Sauce = require("../models/sauce");
-const express = require("express");
-const app = express();
-
-app.use(express.json());
 
 exports.likeSauce = (req, res, next) => {
   Sauce.findOne({ _id: req.params.id })

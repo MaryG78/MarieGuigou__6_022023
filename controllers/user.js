@@ -3,10 +3,7 @@ const cryptoJs = require("crypto-js");
 const jwt = require("jsonwebtoken");
 const User = require("../models/user");
 require("dotenv").config();
-const express = require("express");
-const app = express();
 
-app.use(express.json());
 
 // ENCRYPTED EMAIL
 function encrypted(email) {
@@ -48,7 +45,7 @@ exports.signup = (req, res, next) => {
       user
         .save()
         .then(() => res.status(201).json({ message: "Utilisateur crée" }))
-        .catch((error) => res.status(422).json({ error }));
+        .catch((error) => res.status(422).json({ error })); // erreur dans la requête envoyée
     })
     .catch((error) => res.status(500).json({ error }));
 };
@@ -58,16 +55,16 @@ exports.login = (req, res, next) => {
 
   User.findOne({ email: emailEncrypted })
     .then((user) => {
-      if (user === null) {
+      if (!user) {
         res
-          .status(401)
+          .status(400) // syntaxe erronée
           .json({ message: "Paire identifiant/mot de passe incorrecte" });
       } else {
         bcrypt
           .compare(req.body.password, user.password)
           .then((valid) => {
             if (!valid) {
-              res.status(401).json({
+              res.status(400).json({
                 message: "Paire identifiant/mot de passe incorrecte",
               });
             } else {

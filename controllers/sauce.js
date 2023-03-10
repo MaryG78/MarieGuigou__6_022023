@@ -1,6 +1,4 @@
 // mettre la logique métier des routes du fichier routes/routers
-const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
 const Sauce = require("../models/sauce");
 const express = require("express");
 const app = express();
@@ -10,10 +8,10 @@ app.use(express.json());
 
 exports.createSauce = (req, res, next) => {
   if (!req.file) {
-    return res.status(420).json({ message: "Image manquante" });
+    return res.status(422).json({ message: "Image manquante" }); // requête incomplète
   }
   if (!req.body.sauce) {
-    return res.status(420).json({ message: "Texte manquant" });
+    return res.status(422).json({ message: "Texte manquant" });
   }
 
   const sauceObject = JSON.parse(req.body.sauce);
@@ -29,7 +27,7 @@ exports.createSauce = (req, res, next) => {
   sauce
     .save()
     .then(() => {
-      res.status(200).json(sauce, [
+      res.status(201).json(sauce, [
         {
           rel: "self",
           method: "POST",
@@ -65,7 +63,7 @@ exports.getAllSauce = (req, res, next) => {
         res.status(200).json(saucesHateoas);
       }
     })
-    .catch((error) => res.status(400).json({ error }));
+    .catch((error) => res.status(404).json({ error })); // non trouvé
 };
 
 exports.getOneSauce = (req, res, next) => {
@@ -79,7 +77,7 @@ exports.getOneSauce = (req, res, next) => {
         },
       ])
     )
-    .catch((error) => res.status(404).json({ error }));
+    .catch((error) => res.status(404).json({ error })); // non trouvé
 };
 
 exports.modifySauce = (req, res, next) => {
@@ -114,17 +112,16 @@ exports.modifySauce = (req, res, next) => {
               },
             ])
           )
-          .catch((error) => res.status(401).json({ error }));
+          .catch((error) => res.status(400).json({ error }));
       }
     })
-    .catch((error) => res.status(400).json({ error }));
 };
 
 exports.deleteSauce = (req, res, next) => {
   Sauce.findOne({ _id: req.params.id })
     .then((sauce) => {
       if (sauce.userId != req.auth.userId) {
-        res.status(401).json({ message: "Not authorized" });
+        res.status(403).json({ message: "Not authorized" });
       } else {
         const filename = sauce.imageUrl.split("/images/")[1]; // récupère le nom du fichier à supp
         fs.unlink(`images/${filename}`, () => {
@@ -140,11 +137,11 @@ exports.deleteSauce = (req, res, next) => {
                 },
               ]);
             })
-            .catch((error) => res.status(401).json({ error }));
+            .catch((error) => res.status(400).json({ error }));
         });
       }
     })
     .catch((error) => {
-      res.status(500).json({ error });
+      res.status(400).json({ error });
     });
 };
