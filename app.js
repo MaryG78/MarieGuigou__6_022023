@@ -7,13 +7,14 @@ const logMiddleware = require("./middleware/logMiddleware")
 const path = require("path"); // accès au path du server
 const mongoSanitize = require("express-mongo-sanitize"); // protection contre l'injection NoSQL
 const mongoose = require("mongoose");
-const limiter = require("./middleware/limiter");
-const speedLimiter = require("./middleware/limiter");
+const rateLimiter = require("./middleware/rateLimite")
+const speedLimiter = require("./middleware/slowDown")
 const helmet = require("helmet");
 const hateoasLinker = require("express-hateoas-links");
 
 // Création d'une constante app = notre application / Appel de la méthode express
 const app = express();
+
 app.use(express.json());
 
 app.use(hateoasLinker);
@@ -24,7 +25,7 @@ app.use(
   })
 );
 
-
+// Logger
 app.use(logMiddleware);
 
 logger.info("Hello, Winston!");
@@ -55,7 +56,7 @@ app.use((req, res, next) => {
 
 app.use(mongoSanitize());
 
-app.use("/api", limiter, speedLimiter, routes); // on applique nos routes à notre application
+app.use("/api", rateLimiter, speedLimiter, routes); // on applique nos routes à notre application
 
 app.use("/images", express.static(path.join(__dirname, "images"))); // service de fichiers statics à partir du dossier images
 
