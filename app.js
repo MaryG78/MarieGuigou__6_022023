@@ -2,8 +2,9 @@ const express = require("express"); // import d'Express
 const routes = require("./routes/index"); // import des routes qui sont dans l'index
 require("./config/db.config"); // import de la BDD
 require("dotenv").config();
-const path = require("path"); // accès au path du server
 const logger = require("./config/logger");
+const logMiddleware = require("./middleware/logMiddleware")
+const path = require("path"); // accès au path du server
 const mongoSanitize = require("express-mongo-sanitize"); // protection contre l'injection NoSQL
 const mongoose = require("mongoose");
 const limiter = require("./middleware/limiter");
@@ -23,11 +24,18 @@ app.use(
   })
 );
 
+
+app.use(logMiddleware);
+
+logger.info("Hello, Winston!");
+logger.warn("Warning message");
+logger.error("Error message");
+
 // MIDDLEWARE CORS
 const cors = require("cors");
 app.use(
   cors({
-    origin: process.env.CLIENT_ENDPOINT, 
+    origin: process.env.CLIENT_ENDPOINT,
   })
 );
 
@@ -51,16 +59,10 @@ app.use("/api", limiter, speedLimiter, routes); // on applique nos routes à not
 
 app.use("/images", express.static(path.join(__dirname, "images"))); // service de fichiers statics à partir du dossier images
 
-app.use(function (req, res, next) {
-  req.logger = logger;
-  next();
-});
-
 mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
-
 
 // Export de la variable app pour pouvoir l'utiliser dans d'autres fichiers.
 module.exports = app;

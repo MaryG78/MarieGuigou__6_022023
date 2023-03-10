@@ -1,10 +1,11 @@
-const bunyan = require("bunyan");
+const { createLogger, transports, format } = require("winston");
 
-// Configuration du logger
-const logger = bunyan.createLogger({
-  name: "Piquante",
-  level: "info",
+const logger = createLogger({
+  format: format.combine(format.timestamp(), format.json()),
+  transports: [
+    new transports.Console(),
+    new transports.File({ filename: "logs.log" }),
+  ],
 });
 
-// Exportation du logger
 module.exports = logger;

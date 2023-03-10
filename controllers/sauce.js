@@ -12,10 +12,10 @@ exports.createSauce = (req, res, next) => {
   if (!req.file) {
     return res.status(420).json({message: "Image manquante"});
   }
-  if(!req.body) {
+  if (!(req.body.sauce)) {
     return res.status(420).json({ message: "Texte manquant" });
   }
-  
+
   const sauceObject = JSON.parse(req.body.sauce);
   delete sauceObject._userId;
   const sauce = new Sauce({
@@ -25,10 +25,12 @@ exports.createSauce = (req, res, next) => {
       req.file.filename
     }`,
   });
+
   sauce
     .save()
     .then(() => {
       res.status(201).json({ message: "Sauce enregistrée !" });
+
     })
     .catch((error) => {
       res.status(400).json({ error });
