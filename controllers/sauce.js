@@ -127,15 +127,7 @@ exports.deleteSauce = (req, res, next) => {
         fs.unlink(`images/${filename}`, () => {
           Sauce.deleteOne({ _id: req.params.id })
             .then(() => {
-              res.status(200).json(sauce, [
-                {
-                  rel: "self",
-                  method: "DELETE",
-                  href: `${req.protocol}://${req.get("host")}/api/sauces/${
-                    sauce._id
-                  }`,
-                },
-              ]);
+              res.status(200).json({message:"Sauce deleted!"});
             })
             .catch((error) => res.status(400).json({ error }));
         });
