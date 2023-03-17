@@ -34,11 +34,11 @@ logger.error("Error message");
 
 // MIDDLEWARE CORS
 const cors = require("cors");
-app.use(
-  cors({
-    origin: process.env.CLIENT_ENDPOINT,
-  })
-);
+// app.use(
+//   cors({
+//     origin: process.env.CLIENT_ENDPOINT,
+//   })
+// );
 
 // CORS management
 app.use((req, res, next) => {

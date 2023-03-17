@@ -18,20 +18,6 @@ function encrypted(email) {
   ).toString();
 }
 
-// DECRYPTED EMAIL
-// function decryptEmail(email) {
-//   var bytes = cryptoJs.AES.decrypt(
-//     email,
-//     cryptoJs.enc.Base64.parse(process.env.PASSPHRASE),
-//     {
-//       iv: cryptoJs.enc.Base64.parse(process.env.IV),
-//       mode: cryptoJs.mode.ECB,
-//       padding: cryptoJs.pad.Pkcs7,
-//     }
-//   );
-//   return bytes.toString(cryptoJs.enc.Utf8);
-// }
-
 exports.signup = (req, res, next) => {
   // chiffrage de l'email avant envoie
   bcrypt

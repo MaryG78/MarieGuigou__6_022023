@@ -27,13 +27,7 @@ exports.createSauce = (req, res, next) => {
   sauce
     .save()
     .then(() => {
-      res.status(201).json(sauce, [
-        {
-          rel: "self",
-          method: "POST",
-          href: `${req.protocol}://${req.get("host")}/api/sauces`,
-        },
-      ]);
+      res.status(201).json((sauce, hateoas(req, sauce._id)));
     })
     .catch((error) => {
       res.status(400).json({ error });
@@ -47,17 +41,9 @@ exports.getAllSauce = (req, res, next) => {
         return res.status(404).json({ error: "Aucune sauce n'a été crée" });
       } else {
         const saucesHateoas = sauces.map((sauce) => {
+          const link = hateoas(req, sauce._id);
           return {
-            ...sauce._doc,
-            links: [
-              {
-                rel: "self",
-                method: "GET",
-                href: `${req.protocol}://${req.get("host")}/api/sauces/${
-                  sauce._id
-                }`,
-              },
-            ],
+            ...sauce._doc,link
           };
         });
         res.status(200).json(saucesHateoas);
@@ -68,15 +54,7 @@ exports.getAllSauce = (req, res, next) => {
 
 exports.getOneSauce = (req, res, next) => {
   Sauce.findOne({ _id: req.params.id })
-    .then((sauce) =>
-      res.status(200).json(sauce, [
-        {
-          rel: "self",
-          method: "GET",
-          href: `${req.protocol}://${req.get("host")}/api/sauces/${sauce._id}`,
-        },
-      ])
-    )
+    .then((sauce) => res.status(200).json(sauce, hateoas(req, sauce._id)))
     .catch((error) => res.status(404).json({ error })); // non trouvé
 };
 
@@ -101,17 +79,7 @@ exports.modifySauce = (req, res, next) => {
           { _id: req.params.id }, // la sauce à mettre à jour
           { ...sauceObject, _id: req.params.id }
         ) // avec quel objet : avec ce qu'on a récupéré ds le corps de la fonction
-          .then(() =>
-            res.status(200).json(sauce, [
-              {
-                rel: "self",
-                method: "PUT",
-                href: `${req.protocol}://${req.get("host")}/api/sauces/${
-                  sauce._id
-                }`,
-              },
-            ])
-          )
+          .then((sauce) => res.status(200).json(sauce, hateoas(req, sauce._id)))
           .catch((error) => res.status(400).json({ error }));
       }
     })
@@ -137,3 +105,49 @@ exports.deleteSauce = (req, res, next) => {
       res.status(400).json({ error });
     });
 };
+
+function hateoas(req, id) {
+  const Uri = `${req.protocol}://${req.get("host")}`;
+
+  return [
+    {
+      rel: "create",
+      method: "POST",
+      title: "Create Sauce",
+      href: Uri + "/api/sauces",
+    },
+    {
+      rel: "modify",
+      method: "PUT",
+      title: "Modify Sauce",
+      href: Uri + "/api/sauces/" + id,
+    },
+    {
+      rel: "getOne",
+      method: "GET",
+      title: "Read One Sauce",
+      href: Uri + "/api/sauces/" + id,
+    },
+    {
+      rel: "getAll",
+      method: "GET",
+      title: "Read All Sauces",
+      href: Uri + "/api/sauces",
+    },
+
+    {
+      rel: "delete",
+      method: "DELETE",
+      title: "Delete Sauce",
+      href: Uri + "/api/sauces/" + id,
+    },
+    {
+      rel: "likeDislike",
+      method: "POST",
+      title: "Like or Dislike Sauce",
+      href: Uri + "/api/sauces/" + id + "/like",
+    },
+  ];
+
+
+}

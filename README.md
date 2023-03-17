@@ -18,7 +18,6 @@ Install npm in the project folder
 
 ```bash
   npm install
-  npm init
 ```
 
 Run the server
@@ -60,7 +59,7 @@ To run this project, you will need to add the following environment variables to
 
 `IV`="**\*\*\***"
 
-`CLIENT_ENDPOINT`='http://127.0.0.1:8081' >> don't change this value
+`CLIENT_ENDPOINT`='http://127.0.0.1:4200' >> don't change this value
 
 ## API Reference
 
