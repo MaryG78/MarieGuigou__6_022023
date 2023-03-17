@@ -32,8 +32,6 @@ app.use(
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
     optionsSuccessStatus: 200,
-    // Ajoutez la ligne ci-dessous pour permettre l'accès depuis le client
-    // en spécifiant l'origine correcte
     origin: "http://localhost:4200",
   })
 );
