@@ -26,8 +26,12 @@ exports.createSauce = (req, res, next) => {
 
   sauce
     .save()
-    .then(() => {
-      res.status(201).json((sauce, hateoas(req, sauce._id)));
+        .then(() => {
+      res.status(201).json({
+        sauce,
+        message: "Sauce créée avec succès !",
+        hateoas: hateoas(req, sauce._id)
+      });
     })
     .catch((error) => {
       res.status(400).json({ error });
@@ -79,7 +83,13 @@ exports.modifySauce = (req, res, next) => {
           { _id: req.params.id }, // la sauce à mettre à jour
           { ...sauceObject, _id: req.params.id }
         ) // avec quel objet : avec ce qu'on a récupéré ds le corps de la fonction
-          .then((sauce) => res.status(200).json(sauce, hateoas(req, sauce._id)))
+          .then((sauce) =>
+            res.status(200).json({
+              sauce,
+              message: "Sauce modifiée avec succès !",
+              hateoas: hateoas(req, sauce._id),
+            })
+          )
           .catch((error) => res.status(400).json({ error }));
       }
     })

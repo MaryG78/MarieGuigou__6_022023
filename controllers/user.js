@@ -12,7 +12,7 @@ function encrypted(email) {
     cryptoJs.enc.Base64.parse(process.env.PASSPHRASE),
     {
       iv: cryptoJs.enc.Base64.parse(process.env.IV),
-      mode: cryptoJs.mode.ECB,
+      mode: cryptoJs.mode.CBC,
       padding: cryptoJs.pad.Pkcs7,
     }
   ).toString();

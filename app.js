@@ -2,13 +2,11 @@ const express = require("express"); // import d'Express
 const routes = require("./routes/index"); // import des routes qui sont dans l'index
 require("./config/db.config"); // import de la BDD
 require("dotenv").config();
-const logger = require("./config/logger");
-const logMiddleware = require("./middleware/logMiddleware")
 const path = require("path"); // accès au path du server
 const mongoSanitize = require("express-mongo-sanitize"); // protection contre l'injection NoSQL
 const mongoose = require("mongoose");
-const rateLimiter = require("./middleware/rateLimite")
-const speedLimiter = require("./middleware/slowDown")
+const rateLimiter = require("./middleware/rateLimite");
+const speedLimiter = require("./middleware/slowDown");
 const helmet = require("helmet");
 const hateoasLinker = require("express-hateoas-links");
 
@@ -25,20 +23,20 @@ app.use(
   })
 );
 
-// Logger
-app.use(logMiddleware);
-
-logger.info("Hello, Winston!");
-logger.warn("Warning message");
-logger.error("Error message");
-
 // MIDDLEWARE CORS
 const cors = require("cors");
-// app.use(
-//   cors({
-//     origin: process.env.CLIENT_ENDPOINT,
-//   })
-// );
+app.use(
+  cors({
+    // origin: process.env.CLIENT_ENDPOINT,
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true,
+    optionsSuccessStatus: 200,
+    // Ajoutez la ligne ci-dessous pour permettre l'accès depuis le client
+    // en spécifiant l'origine correcte
+    origin: "http://localhost:4200",
+  })
+);
 
 // CORS management
 app.use((req, res, next) => {
@@ -51,6 +49,16 @@ app.use((req, res, next) => {
     "Access-Control-Allow-Methods",
     "GET, POST, PUT, DELETE, PATCH, OPTIONS"
   );
+  next();
+});
+const logger = require("./config/logger");
+app.use((req, res, next) => {
+  logger.info(req.body);
+  let oldSend = res.send;
+  res.send = function (data) {
+    logger.info(JSON.parse(data));
+    oldSend.apply(res, arguments);
+  };
   next();
 });
 
