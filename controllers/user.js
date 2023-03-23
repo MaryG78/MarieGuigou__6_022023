@@ -30,7 +30,7 @@ exports.signup = (req, res, next) => {
       });
       user
         .save()
-        .then(() => res.status(201).json({ message: "Utilisateur crée" }))
+        .then(() => res.status(201).json({ message: "User created" }))
         .catch((error) => res.status(422).json({ error })); // erreur dans la requête envoyée
     })
     .catch((error) => res.status(500).json({ error }));
@@ -44,14 +44,14 @@ exports.login = (req, res, next) => {
       if (!user) {
         res
           .status(400) // syntaxe erronée
-          .json({ message: "Paire identifiant/mot de passe incorrecte" });
+          .json({ message: "Incorrect login/password pair" });
       } else {
         bcrypt
           .compare(req.body.password, user.password)
           .then((valid) => {
             if (!valid) {
               res.status(400).json({
-                message: "Paire identifiant/mot de passe incorrecte",
+                message: "Incorrect login/password pair",
               });
             } else {
               res.status(200).json({

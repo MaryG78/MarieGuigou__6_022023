@@ -8,10 +8,10 @@ app.use(express.json());
 
 exports.createSauce = (req, res, next) => {
   if (!req.file) {
-    return res.status(422).json({ message: "Image manquante" }); // requête incomplète
+    return res.status(422).json({ message: "Missing image" }); // requête incomplète
   }
   if (!req.body.sauce) {
-    return res.status(422).json({ message: "Texte manquant" });
+    return res.status(422).json({ message: "missing text" });
   }
 
   const sauceObject = JSON.parse(req.body.sauce);
@@ -27,11 +27,7 @@ exports.createSauce = (req, res, next) => {
   sauce
     .save()
         .then(() => {
-      res.status(201).json({
-        sauce,
-        message: "Sauce créée avec succès !",
-        hateoas: hateoas(req, sauce._id)
-      });
+      res.status(201).json({ message: "Your sauce has been created" });
     })
     .catch((error) => {
       res.status(400).json({ error });
@@ -42,7 +38,7 @@ exports.getAllSauce = (req, res, next) => {
   Sauce.find()
     .then((sauces) => {
       if (sauces.length <= 0) {
-        return res.status(404).json({ error: "Aucune sauce n'a été crée" });
+        return res.status(404).json({ error: "No sauce has been created yet" });
       } else {
         const saucesHateoas = sauces.map((sauce) => {
           const link = hateoas(req, sauce._id);
@@ -77,18 +73,13 @@ exports.modifySauce = (req, res, next) => {
     .then((sauce) => {
       // on verifier que la sauce appartient bien au user qui nous envoie la requête put
       if (sauce.userId != req.auth.userId) {
-        res.status(403).json({ message: "Non-autorisé" });
+        res.status(403).json({ message: "Unauthorized" });
       } else {
         Sauce.updateOne(
           { _id: req.params.id }, // la sauce à mettre à jour
           { ...sauceObject, _id: req.params.id }
         ) // avec quel objet : avec ce qu'on a récupéré ds le corps de la fonction
-          .then((sauce) =>
-            res.status(200).json({
-              sauce,
-              message: "Sauce modifiée avec succès !",
-              hateoas: hateoas(req, sauce._id),
-            })
+          .then(() => {res.status(201).json({ message: "Your sauce has been modified" });} 
           )
           .catch((error) => res.status(400).json({ error }));
       }

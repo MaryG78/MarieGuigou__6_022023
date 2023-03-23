@@ -23,11 +23,10 @@ app.use(
   })
 );
 
-// MIDDLEWARE CORS
+// Gestion de la politique CORS
 const cors = require("cors");
 app.use(
   cors({
-    // origin: process.env.CLIENT_ENDPOINT,
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
@@ -36,7 +35,7 @@ app.use(
   })
 );
 
-// CORS management
+// Définition des en-têtes CORS de base pour les requêtes entrantes
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader(
@@ -49,6 +48,7 @@ app.use((req, res, next) => {
   );
   next();
 });
+
 const logger = require("./config/logger");
 app.use((req, res, next) => {
   logger.info(req.body);

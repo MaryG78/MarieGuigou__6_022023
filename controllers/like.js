@@ -78,8 +78,7 @@ exports.likeSauce = (req, res, next) => {
 
           if (!isUserLiked && !isUsersDisliked) {
             res.status(200).json({
-              message:
-                "Vous n'avez pas encore donné votre avis sur cette sauce.",
+              message: "You have not yet given your opinion on this sauce.",
             });
           }
           break;
