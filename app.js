@@ -1,16 +1,15 @@
 const express = require("express"); // import d'Express
 const routes = require("./routes/index"); // import des routes qui sont dans l'index
 require("./config/db.config"); // import de la BDD
-require("dotenv").config();
+require("dotenv").config(); // import des données du fichier .env
 const path = require("path"); // accès au path du server
 const mongoSanitize = require("express-mongo-sanitize"); // protection contre l'injection NoSQL
-const mongoose = require("mongoose");
-const rateLimiter = require("./middleware/rateLimite");
-const speedLimiter = require("./middleware/slowDown");
-const helmet = require("helmet");
-const hateoasLinker = require("express-hateoas-links");
+const mongoose = require("mongoose"); // Gestion de la bdd MongoDB
+const rateLimiter = require("./middleware/rateLimite"); // Limite le nombre de requetes HTTP reçues par le serveur
+const speedLimiter = require("./middleware/slowDown"); // Limite le nombre de requetes HTTP reçues par le serveur dans le temps
+const helmet = require("helmet"); // protections contre les vulnérabilités les plus courantes
+const hateoasLinker = require("express-hateoas-links"); // API REST
 
-// Création d'une constante app = notre application / Appel de la méthode express
 const app = express();
 
 app.use(express.json());
@@ -62,14 +61,13 @@ app.use((req, res, next) => {
 
 app.use(mongoSanitize());
 
-app.use("/api", rateLimiter, speedLimiter, routes); // on applique nos routes à notre application
+app.use("/api", rateLimiter, speedLimiter, routes);
 
-app.use("/images", express.static(path.join(__dirname, "images"))); // service de fichiers statics à partir du dossier images
+app.use("/images", express.static(path.join(__dirname, "images")));
 
 mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
 
-// Export de la variable app pour pouvoir l'utiliser dans d'autres fichiers.
 module.exports = app;

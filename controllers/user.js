@@ -31,7 +31,7 @@ exports.signup = (req, res, next) => {
       user
         .save()
         .then(() => res.status(201).json({ message: "User created" }))
-        .catch((error) => res.status(422).json({ error })); // erreur dans la requête envoyée
+        .catch((error) => res.status(422).json({ error })); 
     })
     .catch((error) => res.status(500).json({ error }));
 };
@@ -43,7 +43,7 @@ exports.login = (req, res, next) => {
     .then((user) => {
       if (!user) {
         res
-          .status(400) // syntaxe erronée
+          .status(400) 
           .json({ message: "Incorrect login/password pair" });
       } else {
         bcrypt

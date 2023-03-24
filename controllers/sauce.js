@@ -8,7 +8,7 @@ app.use(express.json());
 
 exports.createSauce = (req, res, next) => {
   if (!req.file) {
-    return res.status(422).json({ message: "Missing image" }); // requête incomplète
+    return res.status(422).json({ message: "Missing image" });
   }
   if (!req.body.sauce) {
     return res.status(422).json({ message: "missing text" });
@@ -26,7 +26,7 @@ exports.createSauce = (req, res, next) => {
 
   sauce
     .save()
-        .then(() => {
+    .then(() => {
       res.status(201).json({ message: "Your sauce has been created" });
     })
     .catch((error) => {
@@ -43,19 +43,20 @@ exports.getAllSauce = (req, res, next) => {
         const saucesHateoas = sauces.map((sauce) => {
           const link = hateoas(req, sauce._id);
           return {
-            ...sauce._doc,link
+            ...sauce._doc,
+            link,
           };
         });
         res.status(200).json(saucesHateoas);
       }
     })
-    .catch((error) => res.status(404).json({ error })); // non trouvé
+    .catch((error) => res.status(404).json({ error }));
 };
 
 exports.getOneSauce = (req, res, next) => {
   Sauce.findOne({ _id: req.params.id })
     .then((sauce) => res.status(200).json(sauce, hateoas(req, sauce._id)))
-    .catch((error) => res.status(404).json({ error })); // non trouvé
+    .catch((error) => res.status(404).json({ error }));
 };
 
 exports.modifySauce = (req, res, next) => {
@@ -69,21 +70,20 @@ exports.modifySauce = (req, res, next) => {
     : { ...req.body };
 
   delete sauceObject._userId;
-  Sauce.findOne({ _id: req.params.id }) // on récupère la sauce ds la base de données
-    .then((sauce) => {
-      // on verifier que la sauce appartient bien au user qui nous envoie la requête put
-      if (sauce.userId != req.auth.userId) {
-        res.status(403).json({ message: "Unauthorized" });
-      } else {
-        Sauce.updateOne(
-          { _id: req.params.id }, // la sauce à mettre à jour
-          { ...sauceObject, _id: req.params.id }
-        ) // avec quel objet : avec ce qu'on a récupéré ds le corps de la fonction
-          .then(() => {res.status(201).json({ message: "Your sauce has been modified" });} 
-          )
-          .catch((error) => res.status(400).json({ error }));
-      }
-    })
+  Sauce.findOne({ _id: req.params.id }).then((sauce) => {
+    if (sauce.userId != req.auth.userId) {
+      res.status(403).json({ message: "Unauthorized" });
+    } else {
+      Sauce.updateOne(
+        { _id: req.params.id },
+        { ...sauceObject, _id: req.params.id }
+      )
+        .then(() => {
+          res.status(201).json({ message: "Your sauce has been modified" });
+        })
+        .catch((error) => res.status(400).json({ error }));
+    }
+  });
 };
 
 exports.deleteSauce = (req, res, next) => {
@@ -92,11 +92,11 @@ exports.deleteSauce = (req, res, next) => {
       if (sauce.userId != req.auth.userId) {
         res.status(403).json({ message: "Not authorized" });
       } else {
-        const filename = sauce.imageUrl.split("/images/")[1]; // récupère le nom du fichier à supp
+        const filename = sauce.imageUrl.split("/images/")[1]; 
         fs.unlink(`images/${filename}`, () => {
           Sauce.deleteOne({ _id: req.params.id })
             .then(() => {
-              res.status(200).json({message:"Sauce deleted!"});
+              res.status(200).json({ message: "Sauce deleted!" });
             })
             .catch((error) => res.status(400).json({ error }));
         });
@@ -149,6 +149,4 @@ function hateoas(req, id) {
       href: Uri + "/api/sauces/" + id + "/like",
     },
   ];
-
-
 }
