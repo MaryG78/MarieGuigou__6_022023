@@ -1,4 +1,4 @@
-const dotenv = require("dotenv").config();
+require("dotenv").config();
 const mongoose = require("mongoose");
 
 mongoose
@@ -7,7 +7,7 @@ mongoose
     useUnifiedTopology: true,
     SSL: true,
   })
-  .then(() => console.log("Connexion à MongoDB réussie !"))
-  .catch(() => console.log("Connexion à MongoDB échouée !"));
+  .then(() => console.log("Successfully connected to MongoDB!"))
+  .catch(() => console.log("Failed to connect to MongoDB!"));
 
 module.exports = mongoose.connection;
